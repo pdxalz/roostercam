@@ -5,6 +5,8 @@
 
 FROM ubuntu:latest
 
+ENV FTP_PASSWORD=default_password
+
 RUN apt-get update && \
     apt-get install -y vsftpd && \
     apt-get clean
@@ -20,8 +22,7 @@ RUN echo "anonymous_enable=NO" >> /etc/vsftpd.conf && \
     echo "listen=YES" >> /etc/vsftpd.conf && \
     echo "listen_ipv6=NO" >> /etc/vsftpd.conf
 
-RUN useradd -m rooster -s /bin/bash && \
-    echo "rooster:password" | chpasswd
+RUN useradd -m rooster -s /bin/bash
 
 RUN mkdir -p /home/rooster/ftp/upload && \
     chown nobody:nogroup /home/rooster/ftp && \
@@ -32,4 +33,7 @@ RUN mkdir -p /var/run/vsftpd/empty
 
 EXPOSE 20 21
 
-CMD vsftpd /etc/vsftpd.conf
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]
